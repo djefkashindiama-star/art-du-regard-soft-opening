@@ -63,9 +63,23 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 .send{margin-top:6px;padding:16px 0;background:var(--ink);color:var(--paper);font:400 11px Jost;letter-spacing:.34em;text-transform:uppercase}
 .send:disabled{opacity:.5}
 .close{align-self:center;font:italic 400 16px 'Instrument Serif';color:var(--ink);border-bottom:1px solid rgba(27,25,23,.25)}
-.merci{padding:20px 0 10px;text-align:center}
-.merci[hidden]{display:none}
-.merci p{margin:12px auto 18px;max-width:30ch;font:italic 400 18px/1.4 'Instrument Serif';color:rgba(27,25,23,.8)}
+/* Remerciement */
+.thanks{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 9%;opacity:0;pointer-events:none;overflow:hidden}
+.thanks.on{pointer-events:auto}
+.thanks .bg{position:absolute;inset:-8%;background:url(final.jpg) center/cover;filter:blur(18px) brightness(.4) saturate(.8);transform:scale(1.08)}
+.thanks .bg::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 45% at 50% 42%,rgba(214,176,110,.16),transparent 70%),linear-gradient(180deg,rgba(18,13,10,.35),rgba(18,13,10,.75))}
+.thanks>*:not(.bg){position:relative}
+.t-mono{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#f6e4ae,#d3ab5c 40%,#a07431 75%,#664313);box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 0 4px rgba(255,240,200,.18)}
+.t-mono img{width:62%;opacity:.9}
+.t-kick{margin-top:26px;font:400 10px Jost;letter-spacing:.42em;padding-left:.42em;text-transform:uppercase;color:rgba(239,228,207,.7)}
+.t-title{margin-top:8px;font:italic 400 clamp(84px,27vw,132px)/.95 'Instrument Serif';color:var(--cream);letter-spacing:-.01em}
+.t-title span{display:inline-block}
+.t-name{margin-top:6px;font:italic 400 clamp(19px,5.4vw,24px) 'Instrument Serif';color:#fff}
+.t-msg{margin-top:14px;max-width:30ch;font:italic 400 clamp(16px,4.4vw,19px)/1.45 'Instrument Serif';color:rgba(239,228,207,.85);white-space:pre-line}
+.t-rule{width:36px;height:1px;background:rgba(239,228,207,.45);margin:24px 0 18px}
+.t-when{font:400 10.5px/2 Jost;letter-spacing:.32em;padding-left:.32em;text-transform:uppercase;color:var(--cream)}
+.t-cal{margin-top:24px}
+.t-back{margin-top:16px}
 </style>
 </head>
 <body>
@@ -106,13 +120,20 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
         <button class="send" type="submit">Envoyer ma réponse</button>
         <button class="close" type="button" data-close>Fermer</button>
       </form>
-      <div class="merci" id="merci" hidden>
-        <h2>Merci</h2>
-        <p id="merciTxt"></p>
-        <button class="close" type="button" data-close>Revenir à l'invitation</button>
-      </div>
     </div>
   </div>
+  <section class="thanks" id="thanks" aria-live="polite">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="t-mono" aria-hidden="true"><img src="mono-gold.png" alt=""></div>
+    <p class="t-kick">Réponse enregistrée</p>
+    <h2 class="t-title" id="tTitle">Merci</h2>
+    <p class="t-name" id="tName"></p>
+    <p class="t-msg" id="tMsg"></p>
+    <span class="t-rule" id="tRule"></span>
+    <p class="t-when" id="tWhen">Samedi 31 octobre · 18h00<br>Place des Évolués · Kinshasa</p>
+    <button class="cta t-cal" id="tCal">Ajouter au calendrier</button>
+    <button class="sub t-back" id="tBack">Revoir l'invitation</button>
+  </section>
   <div class="veil" id="veil"></div>
 </main>
 
@@ -174,7 +195,7 @@ $('#ctaBtn').addEventListener('click', openSheet);
 sheet.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(); });
 
 // Calendrier
-$('#calBtn').addEventListener('click', () => {
+function addToCal(){
   const s = new Date(CONFIG.debut), en = new Date(s.getTime() + CONFIG.dureeH * 36e5);
   const f = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Art du Regard//FR','BEGIN:VEVENT',
@@ -183,7 +204,9 @@ $('#calBtn').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
   a.download = 'soft-opening-art-du-regard.ics'; a.click();
-});
+}
+$('#calBtn').addEventListener('click', addToCal);
+$('#tCal').addEventListener('click', addToCal);
 
 // RSVP
 $('#rsvp').addEventListener('submit', async e => {
@@ -198,11 +221,32 @@ $('#rsvp').addEventListener('submit', async e => {
   if (CONFIG.endpoint) {
     try { await fetch(CONFIG.endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) }); } catch {}
   }
-  $('#merciTxt').textContent = data.presence === 'oui'
-    ? 'Votre présence est confirmée. Nous avons hâte de vous accueillir.'
-    : 'Votre réponse a bien été reçue. Vous nous manquerez.';
-  form.hidden = true; $('#merci').hidden = false;
-  gsap.from('#merci > *', { opacity: 0, y: 10, duration: .8, stagger: .1, ease: 'power3.out' });
+  showThanks(data);
+});
+
+// Remerciement plein écran
+function showThanks(data){
+  const oui = data.presence === 'oui';
+  const prenom = (data.nom || '').trim();
+  $('#tName').textContent = prenom ? prenom + ',' : '';
+  $('#tMsg').textContent = oui
+    ? 'Votre présence est confirmée.\nNous avons hâte de vous accueillir.'
+    : 'Votre réponse a bien été reçue.\nVous nous manquerez — à très bientôt à l’atelier.';
+  ['#tRule', '#tWhen', '#tCal'].forEach(s => $(s).style.display = oui ? '' : 'none');
+  $('#tTitle').innerHTML = [...'Merci'].map(c => '<span>' + c + '</span>').join('');
+  $('#ctaBtn').textContent = oui ? 'Présence confirmée' : 'Réponse envoyée';
+  closeSheet();
+  const th = $('#thanks'); th.classList.add('on');
+  gsap.timeline({ delay: .35 })
+    .to(th, { opacity: 1, duration: .9, ease: 'power2.out' })
+    .fromTo('#thanks .bg', { scale: 1.16 }, { scale: 1.08, duration: 3, ease: 'power2.out' }, 0)
+    .from('.t-mono', { scale: .6, opacity: 0, rotation: -25, duration: 1.1, ease: 'back.out(1.6)' }, .3)
+    .from('.t-kick', { opacity: 0, y: 8, duration: .8 }, .6)
+    .from('#tTitle span', { opacity: 0, y: 30, filter: 'blur(8px)', duration: 1.1, stagger: .07, ease: 'power3.out' }, .7)
+    .from('.t-name, .t-msg, .t-rule, .t-when, .t-cal, .t-back', { opacity: 0, y: 12, duration: .9, stagger: .1, ease: 'power3.out' }, 1.2);
+}
+$('#tBack').addEventListener('click', () => {
+  gsap.to('#thanks', { opacity: 0, duration: .7, ease: 'power2.inOut', onComplete: () => $('#thanks').classList.remove('on') });
 });
 </script>
 </body>
