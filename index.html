@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Soft Opening II · Art du Regard Atelier</title>
+<meta name="theme-color" content="#120d0a">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="closed.jpg">
+<link rel="preload" as="image" href="final.jpg">
+<style>
+:root{--ink:#1b1917;--paper:#f4efe6;--cream:#efe4cf;--line:rgba(239,228,207,.45);--bg:#120d0a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--cream);font-family:'Instrument Serif',Georgia,serif;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* Fond flou pour les écrans larges */
+.ambient{position:fixed;inset:-10%;background:url(closed.jpg) center/cover;filter:blur(40px) brightness(.45);transform:scale(1.1)}
+/* Cadre 9:16 */
+.frame{position:fixed;left:50%;top:50%;height:min(100vh,177.78vw);height:min(100dvh,177.78vw);aspect-ratio:9/16;transform:translate(-50%,-50%);overflow:hidden;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+@media (max-aspect-ratio:9/16){.frame{width:100vw;height:100dvh;aspect-ratio:auto}}
+.frame img,.frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#still{will-change:transform}
+#video,#final{opacity:0}
+.veil{position:absolute;inset:0;background:#000;z-index:9;pointer-events:none}
+
+/* Invitation à toucher */
+.tap{position:absolute;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:center;padding-bottom:max(9%,calc(env(safe-area-inset-bottom) + 28px))}
+.tap span{font:400 11px Jost;letter-spacing:.42em;text-transform:uppercase;color:var(--cream);padding-left:.42em;opacity:.85}
+.pulse{position:absolute;z-index:4;left:50%;top:var(--seal-y,54%);width:22%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);border:1px solid rgba(239,228,207,.55);pointer-events:none}
+
+/* Après ouverture */
+.after{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:0 8% max(7%,calc(env(safe-area-inset-bottom) + 22px));display:flex;flex-direction:column;align-items:center;text-align:center;pointer-events:none;opacity:0}
+.after.on{pointer-events:auto}
+.for{font:italic 400 clamp(16px,4.6vw,20px) 'Instrument Serif';color:var(--cream)}
+.for em{color:#fff}
+.cta{margin-top:16px;padding:15px 30px;border:1px solid var(--line);font:400 11px Jost;letter-spacing:.36em;text-transform:uppercase;padding-right:calc(30px - .36em);color:var(--cream);background:rgba(18,13,10,.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .5s,border-color .5s}
+.cta:hover,.cta:focus-visible{background:rgba(239,228,207,.12);border-color:var(--cream);outline:none}
+.sub{margin-top:14px;font:italic 400 15px 'Instrument Serif';color:rgba(239,228,207,.75);border-bottom:1px solid rgba(239,228,207,.3);padding-bottom:1px}
+.replay{position:absolute;top:max(16px,env(safe-area-inset-top));right:16px;z-index:7;font:400 10px Jost;letter-spacing:.32em;text-transform:uppercase;color:rgba(239,228,207,.6);padding:8px;opacity:0;pointer-events:none;transition:opacity .8s}
+.replay.on{opacity:1;pointer-events:auto}
+
+/* Feuille de réponse */
+.sheet{position:absolute;inset:0;z-index:8;display:flex;align-items:flex-end;pointer-events:none}
+.sheet .scrim{position:absolute;inset:0;background:rgba(8,6,5,.55);opacity:0;transition:opacity .6s}
+.sheet .panel{position:relative;width:100%;max-height:88%;overflow-y:auto;background:var(--paper);color:var(--ink);padding:34px 8% max(28px,env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .8s cubic-bezier(.22,1,.36,1);-webkit-overflow-scrolling:touch}
+.sheet.on{pointer-events:auto}.sheet.on .scrim{opacity:1}.sheet.on .panel{transform:none}
+.panel h2{font:italic 400 34px/1 'Instrument Serif'}
+.panel .kick{font:400 10px Jost;letter-spacing:.34em;text-transform:uppercase;color:rgba(27,25,23,.55);margin-bottom:10px}
+form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
+.f{display:flex;flex-direction:column}
+.f>span,legend{font:400 10px Jost;letter-spacing:.3em;text-transform:uppercase;color:rgba(27,25,23,.55)}
+.f input,.f select,.f textarea{margin-top:4px;border:0;border-bottom:1px solid rgba(27,25,23,.22);background:transparent;padding:7px 0;font:400 18px 'Instrument Serif';color:var(--ink);outline:none;border-radius:0;resize:none;-webkit-appearance:none;appearance:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-bottom-color:var(--ink)}
+.choice{border:0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.opts label{position:relative}
+.opts input{position:absolute;opacity:0}
+.opts span{display:block;text-align:center;padding:11px 0;border:1px solid rgba(27,25,23,.22);font:italic 400 17px 'Instrument Serif';cursor:pointer;transition:background .3s,color .3s}
+.opts input:checked+span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.send{margin-top:6px;padding:16px 0;background:var(--ink);color:var(--paper);font:400 11px Jost;letter-spacing:.34em;text-transform:uppercase}
+.send:disabled{opacity:.5}
+.close{align-self:center;font:italic 400 16px 'Instrument Serif';color:var(--ink);border-bottom:1px solid rgba(27,25,23,.25)}
+.merci{padding:20px 0 10px;text-align:center}
+.merci[hidden]{display:none}
+.merci p{margin:12px auto 18px;max-width:30ch;font:italic 400 18px/1.4 'Instrument Serif';color:rgba(27,25,23,.8)}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+
+<main class="frame" id="frame">
+  <img id="still" src="closed.jpg" alt="Enveloppe scellée Art du Regard">
+  <video id="video" src="opening.mp4" muted playsinline preload="auto"></video>
+  <img id="final" src="final.jpg" alt="Invitation Soft Opening, Édition II — Samedi 31 octobre, 18h00, Place des Évolués, Kinshasa — Art du Regard Atelier">
+
+  <span class="pulse" id="pulse" aria-hidden="true"></span>
+  <button class="tap" id="tap" aria-label="Ouvrir l'invitation"><span>Touchez pour ouvrir</span></button>
+
+  <div class="after" id="after">
+    <p class="for" id="forLine">Pour <em id="guestName"></em></p>
+    <button class="cta" id="ctaBtn">Confirmer ma présence</button>
+    <button class="sub" id="calBtn">Ajouter au calendrier</button>
+  </div>
+  <button class="replay" id="replay">Rejouer</button>
+
+  <div class="sheet" id="sheet" aria-hidden="true">
+    <div class="scrim" data-close></div>
+    <div class="panel" role="dialog" aria-label="Répondre à l'invitation">
+      <p class="kick">Réponse avant le 30 octobre</p>
+      <h2>Votre réponse</h2>
+      <form id="rsvp">
+        <label class="f"><span>Nom complet</span><input name="nom" required autocomplete="name"></label>
+        <label class="f"><span>Téléphone · WhatsApp</span><input name="tel" type="tel" required autocomplete="tel"></label>
+        <label class="f"><span>E-mail</span><input name="email" type="email" autocomplete="email"></label>
+        <fieldset class="choice"><legend>Serez-vous des nôtres ?</legend>
+          <div class="opts">
+            <label><input type="radio" name="presence" value="oui" checked><span>Avec plaisir</span></label>
+            <label><input type="radio" name="presence" value="non"><span>Avec regret</span></label>
+          </div>
+        </fieldset>
+        <label class="f"><span>Nombre de personnes</span><select name="nb"><option>1</option><option>2</option></select></label>
+        <label class="f"><span>Un mot · facultatif</span><textarea name="msg" rows="2"></textarea></label>
+        <button class="send" type="submit">Envoyer ma réponse</button>
+        <button class="close" type="button" data-close>Fermer</button>
+      </form>
+      <div class="merci" id="merci" hidden>
+        <h2>Merci</h2>
+        <p id="merciTxt"></p>
+        <button class="close" type="button" data-close>Revenir à l'invitation</button>
+      </div>
+    </div>
+  </div>
+  <div class="veil" id="veil"></div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/* ===== À modifier ===== */
+const CONFIG = {
+  debut: '2026-10-31T18:00:00+01:00', dureeH: 4,
+  calTitre: 'Soft Opening II · Art du Regard Atelier', calLieu: 'Place des Évolués, Kinshasa',
+  endpoint: '' // URL /exec du déploiement Apps Script. Vide = aucun envoi réseau.
+};
+
+const $ = s => document.querySelector(s);
+const still = $('#still'), video = $('#video'), fin = $('#final'), sheet = $('#sheet');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const guest = (new URLSearchParams(location.search).get('nom') || '').trim().slice(0, 60);
+if (guest) { $('#guestName').textContent = guest; $('#rsvp').nom.value = guest; }
+else $('#forLine').textContent = 'Sur invitation';
+
+// Rideau levé quand les images sont prêtes
+Promise.race([Promise.all([still, fin].map(i => i.decode().catch(() => {}))), new Promise(r => setTimeout(r, 2500))]).then(() => {
+  if (reduce) return showFinal(true);
+  gsap.to('#veil', { opacity: 0, duration: 1.6, ease: 'power2.out' });
+  gsap.fromTo(still, { scale: 1.06 }, { scale: 1, duration: 6, ease: 'power2.out' });
+  gsap.from('.tap span', { opacity: 0, y: 8, duration: 1.2, delay: 1 });
+  gsap.fromTo('#pulse', { scale: .9, opacity: .7 }, { scale: 1.5, opacity: 0, duration: 2.2, ease: 'sine.out', repeat: -1, delay: 1.4 });
+});
+
+let opened = false;
+$('#tap').addEventListener('click', () => {
+  if (opened) return; opened = true;
+  gsap.killTweensOf('#pulse'); gsap.to('#pulse, .tap span', { opacity: 0, duration: .4 });
+  $('#tap').style.pointerEvents = 'none';
+  gsap.killTweensOf(still); gsap.set(still, { scale: 1 });
+  video.currentTime = 0;
+  const p = video.play();
+  const start = () => gsap.to(video, { opacity: 1, duration: .25, onComplete: () => { still.style.opacity = 0; } });
+  if (p && p.then) p.then(start).catch(() => showFinal()); else start();
+});
+video.addEventListener('ended', () => showFinal());
+video.addEventListener('error', () => { if (opened) showFinal(); });
+
+function showFinal(instant){
+  gsap.set(fin, { opacity: 1 });
+  gsap.to([video, still], { opacity: 0, duration: instant ? 0 : .3 });
+  $('#tap').style.display = 'none'; $('#pulse').style.display = 'none';
+  gsap.set('#veil', { opacity: 0 });
+  $('#after').classList.add('on'); $('#replay').classList.add('on');
+  gsap.set('#after', { opacity: 1 });
+  gsap.fromTo('#after > *', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: instant ? 0 : 1, stagger: .12, ease: 'power3.out' });
+}
+$('#replay').addEventListener('click', () => location.reload());
+
+// Feuille de réponse
+const openSheet = () => { sheet.classList.add('on'); sheet.setAttribute('aria-hidden', 'false'); };
+const closeSheet = () => { sheet.classList.remove('on'); sheet.setAttribute('aria-hidden', 'true'); };
+$('#ctaBtn').addEventListener('click', openSheet);
+sheet.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(); });
+
+// Calendrier
+$('#calBtn').addEventListener('click', () => {
+  const s = new Date(CONFIG.debut), en = new Date(s.getTime() + CONFIG.dureeH * 36e5);
+  const f = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Art du Regard//FR','BEGIN:VEVENT',
+    'UID:' + Date.now() + '@artduregard','DTSTAMP:' + f(new Date()),'DTSTART:' + f(s),'DTEND:' + f(en),
+    'SUMMARY:' + CONFIG.calTitre,'LOCATION:' + CONFIG.calLieu.replace(',', '\\,'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  a.download = 'soft-opening-art-du-regard.ics'; a.click();
+});
+
+// RSVP
+$('#rsvp').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.currentTarget;
+  if (!form.reportValidity()) return;
+  const data = Object.fromEntries(new FormData(form));
+  data.envoyeLe = new Date().toISOString();
+  data.lien = location.href;
+  form.querySelector('.send').disabled = true;
+  try { localStorage.setItem('rsvp', JSON.stringify(data)); } catch {}
+  if (CONFIG.endpoint) {
+    try { await fetch(CONFIG.endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) }); } catch {}
+  }
+  $('#merciTxt').textContent = data.presence === 'oui'
+    ? 'Votre présence est confirmée. Nous avons hâte de vous accueillir.'
+    : 'Votre réponse a bien été reçue. Vous nous manquerez.';
+  form.hidden = true; $('#merci').hidden = false;
+  gsap.from('#merci > *', { opacity: 0, y: 10, duration: .8, stagger: .1, ease: 'power3.out' });
+});
+</script>
+</body>
+</html>
