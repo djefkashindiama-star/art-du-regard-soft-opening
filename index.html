@@ -88,7 +88,7 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 <main class="frame" id="frame">
   <img id="still" src="closed.jpg" alt="Enveloppe scellée Art du Regard">
   <video id="video" src="opening.mp4" muted playsinline preload="auto"></video>
-  <img id="final" src="final.jpg" alt="Invitation Soft Opening, Édition II — Samedi 31 octobre, 18h00, Place des Évolués, Kinshasa — Art du Regard Atelier">
+  <img id="final" src="final.jpg" alt="Invitation Soft Opening, Édition II — Samedi 7 novembre, 18h00, Place des Évolués, Kinshasa — Art du Regard Atelier">
 
   <span class="pulse" id="pulse" aria-hidden="true"></span>
   <button class="tap" id="tap" aria-label="Ouvrir l'invitation"><span>Touchez pour ouvrir</span></button>
@@ -103,7 +103,7 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
   <div class="sheet" id="sheet" aria-hidden="true">
     <div class="scrim" data-close></div>
     <div class="panel" role="dialog" aria-label="Répondre à l'invitation">
-      <p class="kick">Réponse avant le 30 octobre</p>
+      <p class="kick">Réponse avant le 5 novembre</p>
       <h2>Votre réponse</h2>
       <form id="rsvp">
         <label class="f"><span>Nom complet</span><input name="nom" required autocomplete="name"></label>
@@ -130,7 +130,7 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
     <p class="t-name" id="tName"></p>
     <p class="t-msg" id="tMsg"></p>
     <span class="t-rule" id="tRule"></span>
-    <p class="t-when" id="tWhen">Samedi 31 octobre · 18h00<br>Place des Évolués · Kinshasa</p>
+    <p class="t-when" id="tWhen">Samedi 7 novembre · 18h00<br>Place des Évolués · Kinshasa</p>
     <button class="cta t-cal" id="tCal">Ajouter au calendrier</button>
     <button class="sub t-back" id="tBack">Revoir l'invitation</button>
   </section>
@@ -141,7 +141,7 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 <script>
 /* ===== À modifier ===== */
 const CONFIG = {
-  debut: '2026-10-31T18:00:00+01:00', dureeH: 4,
+  debut: '2026-11-07T18:00:00+01:00', dureeH: 4,
   calTitre: 'Soft Opening II · Art du Regard Atelier', calLieu: 'Place des Évolués, Kinshasa',
   endpoint: '' // URL /exec du déploiement Apps Script. Vide = aucun envoi réseau.
 };
