@@ -36,6 +36,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .after.on{pointer-events:auto}
 .for{font:italic 400 clamp(16px,4.6vw,20px) 'Instrument Serif';color:var(--cream)}
 .for em{color:#fff}
+.adr{margin-top:8px;font:400 9.5px/1.9 Jost;letter-spacing:.24em;padding-left:.24em;text-transform:uppercase;color:rgba(239,228,207,.8)}
 .cta{margin-top:16px;padding:15px 30px;border:1px solid var(--line);font:400 11px Jost;letter-spacing:.36em;text-transform:uppercase;padding-right:calc(30px - .36em);color:var(--cream);background:rgba(18,13,10,.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .5s,border-color .5s}
 .cta:hover,.cta:focus-visible{background:rgba(239,228,207,.12);border-color:var(--cream);outline:none}
 .sub{margin-top:14px;font:italic 400 15px 'Instrument Serif';color:rgba(239,228,207,.75);border-bottom:1px solid rgba(239,228,207,.3);padding-bottom:1px}
@@ -88,13 +89,14 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 <main class="frame" id="frame">
   <img id="still" src="closed.jpg" alt="Enveloppe scellée Art du Regard">
   <video id="video" src="opening.mp4" muted playsinline preload="auto"></video>
-  <img id="final" src="final.jpg" alt="Invitation Soft Opening, Édition II — Samedi 7 novembre, 18h00, Place des Évolués, Kinshasa — Art du Regard Atelier">
+  <img id="final" src="final.jpg" alt="Invitation Soft Opening, Édition II — Samedi 7 novembre, 18h00, 20, Av. Caisse d’Épargne, Kinshasa-Gombe, Place des Évolués — Art du Regard Atelier">
 
   <span class="pulse" id="pulse" aria-hidden="true"></span>
   <button class="tap" id="tap" aria-label="Ouvrir l'invitation"><span>Touchez pour ouvrir</span></button>
 
   <div class="after" id="after">
     <p class="for" id="forLine">Pour <em id="guestName"></em></p>
+    <p class="adr">20, Av. Caisse d’Épargne · Kinshasa-Gombe<br>Place des Évolués</p>
     <button class="cta" id="ctaBtn">Confirmer ma présence</button>
     <button class="sub" id="calBtn">Ajouter au calendrier</button>
   </div>
@@ -130,7 +132,7 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
     <p class="t-name" id="tName"></p>
     <p class="t-msg" id="tMsg"></p>
     <span class="t-rule" id="tRule"></span>
-    <p class="t-when" id="tWhen">Samedi 7 novembre · 18h00<br>Place des Évolués · Kinshasa</p>
+    <p class="t-when" id="tWhen">Samedi 7 novembre · 18h00<br>20, Av. Caisse d’Épargne · Kinshasa-Gombe<br>Place des Évolués</p>
     <button class="cta t-cal" id="tCal">Ajouter au calendrier</button>
     <button class="sub t-back" id="tBack">Revoir l'invitation</button>
   </section>
@@ -142,8 +144,8 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 /* ===== À modifier ===== */
 const CONFIG = {
   debut: '2026-11-07T18:00:00+01:00', dureeH: 4,
-  calTitre: 'Soft Opening II · Art du Regard Atelier', calLieu: 'Place des Évolués, Kinshasa',
-  endpoint: '' // URL /exec du déploiement Apps Script. Vide = aucun envoi réseau.
+  calTitre: 'Soft Opening II · Art du Regard Atelier', calLieu: '20, Av. Caisse d’Épargne, Kinshasa-Gombe, Place des Évolués',
+  endpoint: 'https://script.google.com/macros/s/AKfycbx67IHlThCIvVVxwo33n6cNQuieTEYkR1L4XChOY6UaMrNahk3uqh-x_tZGaPdtLAL8/exec' // URL /exec du déploiement Apps Script. Vide = aucun envoi réseau.
 };
 
 const $ = s => document.querySelector(s);
@@ -200,7 +202,7 @@ function addToCal(){
   const f = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Art du Regard//FR','BEGIN:VEVENT',
     'UID:' + Date.now() + '@artduregard','DTSTAMP:' + f(new Date()),'DTSTART:' + f(s),'DTEND:' + f(en),
-    'SUMMARY:' + CONFIG.calTitre,'LOCATION:' + CONFIG.calLieu.replace(',', '\\,'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    'SUMMARY:' + CONFIG.calTitre,'LOCATION:' + CONFIG.calLieu.replace(/,/g, '\\,'),'END:VEVENT','END:VCALENDAR'].join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
   a.download = 'soft-opening-art-du-regard.ics'; a.click();
@@ -219,7 +221,7 @@ $('#rsvp').addEventListener('submit', async e => {
   form.querySelector('.send').disabled = true;
   try { localStorage.setItem('rsvp', JSON.stringify(data)); } catch {}
   if (CONFIG.endpoint) {
-    try { await fetch(CONFIG.endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(data) }); } catch {}
+    try { await fetch(CONFIG.endpoint, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ ...data, tel: "'" + (data.tel || "") }) }); } catch {}
   }
   showThanks(data);
 });
