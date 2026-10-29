@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="closed.jpg">
 <link rel="preload" as="image" href="final.jpg">
-<link rel="preload" as="image" href="partner-magic.png">
 <style>
 :root{--ink:#1b1917;--paper:#f4efe6;--cream:#efe4cf;--line:rgba(239,228,207,.45);--bg:#120d0a}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -81,12 +80,6 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
 .t-when{font:400 10.5px/2 Jost;letter-spacing:.32em;padding-left:.32em;text-transform:uppercase;color:var(--cream)}
 .t-cal{margin-top:24px}
 .t-back{margin-top:16px}
-.partner{display:flex;flex-direction:column;align-items:center;gap:8px}
-.partner small{font:400 9px Jost;letter-spacing:.38em;padding-left:.38em;text-transform:uppercase;color:rgba(239,228,207,.55)}
-.frame .partner img{position:static;inset:auto;height:58px;width:auto;display:block;object-fit:contain}
-.after .partner img{height:42px}
-.after .partner{margin-top:16px;gap:6px}
-.t-partner{margin-top:28px}
 </style>
 </head>
 <body>
@@ -104,7 +97,6 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
     <p class="for" id="forLine">Pour <em id="guestName"></em></p>
     <button class="cta" id="ctaBtn">Confirmer ma présence</button>
     <button class="sub" id="calBtn">Ajouter au calendrier</button>
-    <div class="partner"><small>En partenariat avec</small><img src="partner-magic.png" alt="Magic Nail Bar"></div>
   </div>
   <button class="replay" id="replay">Rejouer</button>
 
@@ -141,7 +133,6 @@ form{margin-top:22px;display:flex;flex-direction:column;gap:18px}
     <p class="t-when" id="tWhen">Samedi 31 octobre · 18h00<br>Place des Évolués · Kinshasa</p>
     <button class="cta t-cal" id="tCal">Ajouter au calendrier</button>
     <button class="sub t-back" id="tBack">Revoir l'invitation</button>
-    <div class="partner t-partner"><small>En partenariat avec</small><img src="partner-magic.png" alt="Magic Nail Bar"></div>
   </section>
   <div class="veil" id="veil"></div>
 </main>
@@ -252,7 +243,7 @@ function showThanks(data){
     .from('.t-mono', { scale: .6, opacity: 0, rotation: -25, duration: 1.1, ease: 'back.out(1.6)' }, .3)
     .from('.t-kick', { opacity: 0, y: 8, duration: .8 }, .6)
     .from('#tTitle span', { opacity: 0, y: 30, filter: 'blur(8px)', duration: 1.1, stagger: .07, ease: 'power3.out' }, .7)
-    .from('.t-name, .t-msg, .t-rule, .t-when, .t-cal, .t-back, .t-partner', { opacity: 0, y: 12, duration: .9, stagger: .1, ease: 'power3.out' }, 1.2);
+    .from('.t-name, .t-msg, .t-rule, .t-when, .t-cal, .t-back', { opacity: 0, y: 12, duration: .9, stagger: .1, ease: 'power3.out' }, 1.2);
 }
 $('#tBack').addEventListener('click', () => {
   gsap.to('#thanks', { opacity: 0, duration: .7, ease: 'power2.inOut', onComplete: () => $('#thanks').classList.remove('on') });
